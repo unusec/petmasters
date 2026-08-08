@@ -9,6 +9,13 @@
     "preview": "vitepress preview docs"
   },
   "dependencies": {
+    "@milkdown/core": "^7.22.0",
+    "@milkdown/crepe": "^7.22.0",
+    "@milkdown/plugin-history": "^7.22.0",
+    "@milkdown/plugin-upload": "^7.22.0",
+    "@milkdown/preset-commonmark": "^7.22.0",
+    "@milkdown/utils": "^7.22.0",
+    "@milkdown/vue": "^7.22.0",
     "vue": "^3.4.0"
   },
   "devDependencies": {

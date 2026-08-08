@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(xargs cat *)",
+      "Bash(xargs grep *)",
+      "Bash(xargs head *)",
+      "Bash(grep '$node\\\\|nodeViewFactory' d:/DI/difg/node_modules/@milkdown/kit/lib/utils.d.ts)"
+    ]
+  }
+}

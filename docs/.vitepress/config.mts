@@ -6,8 +6,8 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
-  title: "PetMasters",
-  description: "Diablo Immortal Familiars Knowledge Base & Conversion Guide",
+  title: "Diablo Immortal Familiars Knowledge Base & Conversion Guide",
+  description: "Diablo Immortal Familiars conversion guide brought to you by the PetMasters Discord Community, a place where players can share knowledge and strategies for optimizing their familiars.",
   appearance: 'force-dark',
   cleanUrls: true,
   base: '/petmasters/',
@@ -30,7 +30,6 @@ export default defineConfig({
       {
         text: '🐾 Getting Started',
         items: [
-          { text: 'Overview & Introduction', link: '/' },
           { text: 'Familiar Classification', link: '/guides/familiars-classification' },
         ]
       },
@@ -43,7 +42,7 @@ export default defineConfig({
         ]
       },
       {
-        text: '🏛️ Westmarch Market & NPCs',
+        text: '🏛️ Market & NPCs',
         items: [
           { text: 'Nisza NPC Guide', link: '/guides/nisza-npc' },
         ]
@@ -72,9 +71,9 @@ export default defineConfig({
   transformPageData(pageData) {
     const mdPath = resolve(__dirname, '..', pageData.relativePath)
     try {
-      ;(pageData as any).rawMarkdown = readFileSync(mdPath, 'utf-8')
+      ; (pageData as any).rawMarkdown = readFileSync(mdPath, 'utf-8')
     } catch {
-      ;(pageData as any).rawMarkdown = ''
+      ; (pageData as any).rawMarkdown = ''
     }
   }
 })

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(grep 'editorViewOptionsCtx\\\\|$node\\\\|nodeViewFactory' d:/DI/difg/node_modules/@milkdown/kit/lib/core.d.ts)",
+      "Bash(xargs ls *)",
+      "Bash(grep -rn '$nodeSchema' /d/DI/difg/node_modules/@milkdown/components/src '--include=*.ts')"
+    ]
+  }
+}

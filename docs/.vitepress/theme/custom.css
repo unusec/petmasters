@@ -19,9 +19,8 @@
   --vp-c-bg-elv: #171717;
   --vp-c-bg-soft: #121212;
 
-  /* Borders with a subtle crimson ember tint */
-  --vp-c-border: rgba(110, 28, 18, 0.35);
-  --vp-c-divider: rgba(110, 28, 18, 0.25);
+  --vp-c-border: rgba(255, 255, 255, 0.07);
+  --vp-c-divider: rgba(255, 255, 255, 0.05);
 
   /* Slightly warm text so it reads well against the dark purple */
   --vp-c-text-1: rgba(245, 238, 230, 0.92);
@@ -29,6 +28,29 @@
   --vp-c-text-3: rgba(170, 150, 135, 0.48);
 
   --vp-home-hero-name-background: linear-gradient(135deg, #f3c766 0%, #e5ad35 50%, #b84018 100%);
+}
+
+/* Global scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+html::-webkit-scrollbar {
+  width: 5px;
+}
+
+html::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Hero: full-viewport height, text anchored below the portal graphic */
@@ -69,7 +91,7 @@
   border-top: none !important;
 }
 
-.VPNavBarSearch > button {
+.VPNavBarSearch>button {
   width: 220px;
 }
 
@@ -95,115 +117,127 @@
   box-shadow: 0 6px 16px rgba(229, 173, 53, 0.4);
 }
 
-.editor-modal-backdrop {
+/* ─── Fullscreen modal ─────────────────────────── */
+.editor-fullscreen {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-}
-
-.editor-modal-content {
-  background: #161922;
-  border: 1px solid #2e3547;
-  border-radius: 12px;
-  width: min(92vw, 1100px);
-  height: 92vh;
+  z-index: 9999;
+  background: var(--vp-c-bg);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-  overflow: hidden;
 }
 
-.editor-header {
-  padding: 1rem 1.5rem;
-  background: #1a1e2b;
-  border-bottom: 1px solid #2e3547;
+.editor-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 1.5rem;
+  height: 56px;
+  background: var(--vp-c-bg-elv);
+  border-bottom: 1px solid var(--vp-c-divider);
+  flex-shrink: 0;
 }
 
-.editor-header h3 {
-  margin: 0;
+.editor-topbar-title {
+  font-size: 1rem;
+  font-weight: 600;
   color: #f3c766;
-  font-size: 1.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .editor-close-btn {
   background: transparent;
   border: none;
   color: #a0aec0;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
+  line-height: 1;
   cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
 }
 
-.editor-body {
-  padding: 1.25rem 1.5rem;
+.editor-close-btn:hover {
+  color: #e2e8f0;
+  background: var(--vp-c-bg-soft);
+}
+
+/* Scrollable body */
+.editor-fullscreen-body {
   flex: 1;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  overflow: hidden;
+  overflow-y: auto;
+  padding: 1.5rem;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.editor-fullscreen-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.editor-fullscreen-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.editor-fullscreen-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+.editor-fullscreen-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .editor-hint {
-  margin: 0;
+  margin: 0 0 1rem;
   color: #a0aec0;
   font-size: 0.875rem;
 }
 
-.editor-loading {
-  flex: 1;
+/* Footer bar */
+.editor-fullscreen-footer {
+  flex-shrink: 0;
+  background: var(--vp-c-bg-elv);
+  border-top: 1px solid var(--vp-c-divider);
+  padding: 0.85rem 1.5rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #a0aec0;
-  font-size: 0.95rem;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .editor-meta-row {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
 }
 
-.editor-meta-row .editor-input-group {
+.editor-meta-row input {
   flex: 1;
-}
-
-.editor-content-group {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.editor-content-area {
-  flex: 1;
-  min-height: 0;
-  resize: none;
-  font-family: 'Menlo', 'Consolas', monospace;
-  font-size: 0.875rem;
-  line-height: 1.6;
-  background: #0d0f14;
-  border: 1px solid #2e3547;
+  min-width: 0;
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-border);
   border-radius: 6px;
-  padding: 0.75rem;
+  padding: 0.5rem 0.75rem;
   color: #f7fafc;
+  font-family: inherit;
+  font-size: 0.9rem;
 }
 
-.editor-success {
-  background: rgba(72, 187, 120, 0.15);
-  border: 1px solid #48bb78;
-  padding: 0.85rem 1rem;
-  border-radius: 6px;
-  color: #68d391;
-  font-size: 0.9rem;
+.editor-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .editor-input-group {
@@ -222,19 +256,20 @@
   background: #0d0f14;
   border: 1px solid #2e3547;
   border-radius: 6px;
-  padding: 0.6rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   color: #f7fafc;
   font-family: inherit;
   font-size: 0.9rem;
 }
 
-.editor-footer {
-  padding: 1rem 1.5rem;
-  background: #1a1e2b;
-  border-top: 1px solid #2e3547;
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
+.editor-success {
+  background: rgba(72, 187, 120, 0.15);
+  border: 1px solid #48bb78;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  color: #68d391;
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .editor-submit-btn {
@@ -245,6 +280,31 @@
   padding: 0.6rem 1.25rem;
   border-radius: 6px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.editor-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.editor-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(15, 17, 23, 0.3);
+  border-top-color: #0f1117;
+  border-radius: 50%;
+  animation: editor-spin 0.65s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes editor-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .editor-cancel-btn {
@@ -254,4 +314,83 @@
   padding: 0.6rem 1.25rem;
   border-radius: 6px;
   cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ─── Crepe editor container ───────────────────── */
+.milkdown-crepe-container {
+  width: 100%;
+}
+
+/* Override Crepe's frame-dark variables to match site palette */
+.milkdown-crepe-container .milkdown {
+  --crepe-color-background: var(--vp-c-bg-elv);
+  --crepe-color-on-background: var(--vp-c-text-1);
+  --crepe-color-surface: var(--vp-c-bg);
+  --crepe-color-surface-low: var(--vp-c-bg-alt);
+  --crepe-color-on-surface: var(--vp-c-text-2);
+  --crepe-color-on-surface-variant: var(--vp-c-text-3);
+  --crepe-color-outline: var(--vp-c-border);
+  --crepe-color-primary: #e5ad35;
+  --crepe-color-secondary: var(--vp-c-bg-soft);
+  --crepe-color-on-secondary: var(--vp-c-text-1);
+  --crepe-color-inverse: #f3c766;
+  --crepe-color-on-inverse: var(--vp-c-bg);
+  --crepe-color-inline-code: #93c5fd;
+  --crepe-color-error: #fc8181;
+  --crepe-color-hover: var(--vp-c-bg-soft);
+  --crepe-color-selected: var(--vp-c-bg-alt);
+  --crepe-color-inline-area: var(--vp-c-bg-alt);
+  --crepe-shadow-1: 0px 2px 8px rgba(0, 0, 0, 0.6);
+  --crepe-shadow-2: 0px 4px 16px rgba(0, 0, 0, 0.7);
+
+  min-height: 60vh;
+  border: 1px solid var(--vp-c-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Slash menu: compact height */
+.milkdown .milkdown-slash-menu .menu-groups {
+  max-height: 260px;
+}
+
+.milkdown .milkdown-slash-menu .menu-groups .menu-group li {
+  padding: 8px 10px;
+}
+
+.milkdown .milkdown-slash-menu .menu-groups .menu-group h6 {
+  padding: 8px 10px;
+}
+
+/* YouTube embed node in editor */
+.youtube-embed-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 0.5rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--vp-c-border);
+  background: #000;
+}
+
+.youtube-embed-preview {
+  display: block;
+  width: 100%;
+  height: 400px;
+  border: none;
+}
+
+.custom-block.important {
+  background-color: rgb(179 2 141 / 35%);
+}
+
+.custom-block.tip {
+  border-color: var(--vp-custom-block-tip-border);
+  color: var(--vp-custom-block-tip-text);
+  background-color: rgb(0 165 28 / 35%);
+}
+
+.custom-block.caution {
+  background-color: rgb(255 0 0 / 35%);
 }

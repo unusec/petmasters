@@ -3,6 +3,8 @@ import { h } from 'vue'
 import { useData } from 'vitepress'
 import InSiteEditor from './components/InSiteEditor.vue'
 import PortalBackground from './components/PortalBackground.vue'
+import '@milkdown/crepe/theme/common/style.css'
+import '@milkdown/crepe/theme/frame-dark.css'
 import './custom.css'
 import './conversion.css'
 

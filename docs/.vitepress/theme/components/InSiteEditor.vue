@@ -5,71 +5,87 @@
     </button>
 
     <Teleport to="body">
-      <div v-if="isOpen" class="editor-modal-backdrop" @click.self="closeEditor">
-        <div class="editor-modal-content">
-          <div class="editor-header">
-            <h3>✏️ Suggest Edit — {{ pageTitle }}</h3>
-            <button class="editor-close-btn" @click="closeEditor">&times;</button>
+      <div v-if="isOpen" class="editor-fullscreen">
+
+        <div class="editor-topbar">
+          <span class="editor-topbar-title">✏️ Suggest Edit — {{ pageTitle }}</span>
+          <button class="editor-close-btn" @click="closeEditor" title="Close (Esc)">&times;</button>
+        </div>
+
+        <div class="editor-fullscreen-body">
+          <p class="editor-hint">
+            Edit the content below. Drag and drop images directly into the editor — they'll be included in the pull
+            request.
+            Your changes go to the Discord moderation queue before going live.
+          </p>
+          <MilkdownEditor ref="milkdownRef" :initial-content="rawContent" :on-image-file="handleImageFile" />
+        </div>
+
+        <div class="editor-fullscreen-footer">
+          <div class="editor-meta-row">
+            <input v-model="author" type="text" placeholder="Your Name / Discord Handle" />
+            <input v-model="summary" type="text" placeholder="Brief Description of Change" />
           </div>
-
-          <div class="editor-body">
-            <p class="editor-hint">
-              Edit the markdown below. Your changes go to the Discord moderation queue before going live.
-            </p>
-
-            <div class="editor-meta-row">
-              <div class="editor-input-group">
-                <label>Your Name / Discord Handle</label>
-                <input v-model="author" type="text" placeholder="@PetMaster99 or Anonymous" />
-              </div>
-              <div class="editor-input-group">
-                <label>Brief Description of Change</label>
-                <input v-model="summary" type="text" placeholder="e.g. Added Varog trait stacking details" />
-              </div>
-            </div>
-
-            <div class="editor-input-group editor-content-group">
-              <label>Page Markdown</label>
-              <textarea v-model="content" class="editor-content-area" spellcheck="false"></textarea>
-            </div>
-
+          <div class="editor-footer-actions">
             <div v-if="submitted" class="editor-success">
-              🎉 <strong>Thank you!</strong> Your suggestion has been submitted for mod review!
+              🎉 <strong>Thank you!</strong> Submitted for review!
             </div>
-          </div>
-
-          <div class="editor-footer">
-            <button class="editor-cancel-btn" @click="closeEditor">Cancel</button>
             <button class="editor-submit-btn" :disabled="submitting" @click="submitEdit">
-              {{ submitting ? 'Submitting…' : 'Submit for Mod Review' }}
+              <span v-if="submitting" class="editor-spinner" aria-hidden="true"></span>
+              {{ submitting ? 'Submitting…' : 'Submit for Review' }}
             </button>
           </div>
         </div>
+
       </div>
     </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted, defineAsyncComponent } from 'vue'
 import { useData } from 'vitepress'
+
+// Async import keeps Milkdown out of the SSR bundle and code-splits it
+const MilkdownEditor = defineAsyncComponent(() => import('./MilkdownEditor.vue'))
 
 const { page } = useData()
 
 const isOpen = ref(false)
 const submitting = ref(false)
 const submitted = ref(false)
+const rawContent = ref('')
 
 const author = ref('')
 const summary = ref('')
-const content = ref('')
+const milkdownRef = ref(null)
+const pendingImages = new Map() // blobUrl → File
 
 const pageTitle = computed(() => page.value.title || page.value.relativePath)
 
+onMounted(() => {
+  author.value = localStorage.getItem('editor_author') ?? ''
+})
+
+watch(author, v => localStorage.setItem('editor_author', v))
+
+function handleImageFile(file) {
+  const url = URL.createObjectURL(file)
+  pendingImages.set(url, file)
+  return url
+}
+
+function onKeydown(e) {
+  if (e.key === 'Escape') closeEditor()
+}
+
 function openEditor() {
-  isOpen.value = true
   submitted.value = false
-  content.value = page.value.rawMarkdown || fallback()
+  pendingImages.clear()
+  rawContent.value = page.value.rawMarkdown || fallback()
+  isOpen.value = true
+  document.body.style.overflow = 'hidden'
+  window.addEventListener('keydown', onKeydown)
 }
 
 function fallback() {
@@ -78,13 +94,31 @@ function fallback() {
 
 function closeEditor() {
   isOpen.value = false
+  submitted.value = false
+  pendingImages.clear()
+  document.body.style.overflow = ''
+  window.removeEventListener('keydown', onKeydown)
 }
 
-// Creates a GitHub branch + updates the file + opens a PR.
-// Returns the PR URL or null if GitHub is not configured.
-async function createGitHubPR() {
+async function uploadImageToGitHub(headers, api, branch, blobUrl, file) {
+  const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+  const path = `docs/public/img/suggestions/${filename}`
+  const bytes = await file.arrayBuffer()
+  const binary = Array.from(new Uint8Array(bytes), b => String.fromCharCode(b)).join('')
+  const encoded = btoa(binary)
+
+  await fetch(`${api}/contents/${path}`, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify({ message: `upload suggestion image: ${filename}`, content: encoded, branch })
+  })
+
+  return { blobUrl, finalPath: `/petmasters/img/suggestions/${filename}` }
+}
+
+async function createGitHubPR(markdownContent) {
   const token = import.meta.env.VITE_GITHUB_TOKEN
-  const repo = import.meta.env.VITE_GITHUB_REPO // e.g. "UnuSec/petmasters"
+  const repo = import.meta.env.VITE_GITHUB_REPO
   if (!token || !repo) return null
 
   const headers = {
@@ -97,30 +131,35 @@ async function createGitHubPR() {
   const filePath = `docs/${page.value.relativePath}`
   const branch = `suggestion/${Date.now()}`
 
-  // Get default branch and its HEAD SHA
   const { default_branch } = await fetch(api, { headers }).then(r => r.json())
   const { object: { sha: headSha } } = await fetch(
     `${api}/git/refs/heads/${default_branch}`, { headers }
   ).then(r => r.json())
 
-  // Get current file SHA (needed by the GitHub Contents API to update)
   const { sha: fileSha } = await fetch(
     `${api}/contents/${filePath}`, { headers }
   ).then(r => r.json())
 
-  // UTF-8-safe base64 encode
-  const bytes = new TextEncoder().encode(content.value)
-  const binary = Array.from(bytes, b => String.fromCharCode(b)).join('')
-  const encoded = btoa(binary)
-
-  // Create branch, push file, open PR
   await fetch(`${api}/git/refs`, {
-    method: 'POST', headers,
+    method: 'POST',
+    headers,
     body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: headSha })
   })
 
+  // Upload any embedded images and rewrite their blob URLs to final paths
+  let finalMarkdown = markdownContent
+  for (const [blobUrl, file] of pendingImages) {
+    const { finalPath } = await uploadImageToGitHub(headers, api, branch, blobUrl, file)
+    finalMarkdown = finalMarkdown.replaceAll(blobUrl, finalPath)
+  }
+
+  const bytes = new TextEncoder().encode(finalMarkdown)
+  const binary = Array.from(bytes, b => String.fromCharCode(b)).join('')
+  const encoded = btoa(binary)
+
   await fetch(`${api}/contents/${filePath}`, {
-    method: 'PUT', headers,
+    method: 'PUT',
+    headers,
     body: JSON.stringify({
       message: `suggestion: ${summary.value}`,
       content: encoded,
@@ -130,7 +169,8 @@ async function createGitHubPR() {
   })
 
   const { html_url } = await fetch(`${api}/pulls`, {
-    method: 'POST', headers,
+    method: 'POST',
+    headers,
     body: JSON.stringify({
       title: `[Wiki Suggestion] ${summary.value}`,
       body: `**Page:** ${pageTitle.value}\n**Suggested by:** ${author.value || 'Anonymous'}\n\n> ${summary.value}`,
@@ -143,7 +183,7 @@ async function createGitHubPR() {
 }
 
 async function submitEdit() {
-  if (!summary.value) {
+  if (!summary.value.trim()) {
     alert('Please provide a brief description of your change!')
     return
   }
@@ -156,10 +196,10 @@ async function submitEdit() {
 
   submitting.value = true
   try {
-    // 1. Open the GitHub PR first so we can link to it from Discord
-    const prUrl = await createGitHubPR().catch(() => null)
+    const markdownContent = milkdownRef.value?.getContent() ?? rawContent.value
 
-    // 2. Build Discord embed
+    const prUrl = await createGitHubPR(markdownContent).catch(() => null)
+
     const fields = [
       { name: '📄 Page', value: pageTitle.value, inline: true },
       { name: '👤 Suggested by', value: author.value || 'Anonymous', inline: true },
@@ -182,9 +222,8 @@ async function submitEdit() {
       timestamp: new Date().toISOString()
     }
 
-    // 3. Post to Discord — attach the .md file as backup even when a PR exists
     const filename = page.value.relativePath.replace(/\//g, '_')
-    const file = new Blob([content.value], { type: 'text/plain' })
+    const file = new Blob([markdownContent], { type: 'text/plain' })
     const form = new FormData()
     form.append('payload_json', JSON.stringify({ embeds: [embed] }))
     form.append('files[0]', file, filename)
