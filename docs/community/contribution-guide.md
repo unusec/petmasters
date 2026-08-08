@@ -1,6 +1,6 @@
 # How to Contribute & Suggest Updates
 
-We welcome all to contribute knowledge/correction updates to our guide!
+We welcome all to contribute knowledge/corrections/updates to our guide!
 
 ---
 
