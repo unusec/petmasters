@@ -7,9 +7,9 @@ In Diablo Immortal, familiars are classified by their **Type** (Normal/Ordinary 
 ## 1. Familiar Type Classification
 
 ### 🔵 Normal / Ordinary Familiars
-- **Market Status**: Cannot be listed or sold on the market.
-- **Skill Caps**: Can have Blue (normal) skills or Enhanced Rare skills.
-- **Trait Caps**: Can unlock Legendary Traits if they possess an Enhanced Rare skill.
+- **Market Status**: If they come from contracts after the patch they are bound to the player and cannot be listed or sold on the market.
+- **Skill Caps**: Can have Enhanced Rare skills.
+- **Trait Caps**: Can unlock Legendary Traits if they possess an Enhanced Rare skills.
 - **Obtainability**:
   - Contracts bought from **Nisza** NPC for 10,000 gold.
   - Random contract drops from farming Open World, Dungeons, Lairs, and Towers.
@@ -18,7 +18,7 @@ In Diablo Immortal, familiars are classified by their **Type** (Normal/Ordinary 
 ### 🔴 Aberrant Familiars
 - **Market Status**: **Can be bought and sold on the market.**
 - **Skill Caps**: Can possess **Legendary Skills** (Red with purple border).
-- **Trait Caps**: Can possess Legendary Traits.
+- **Trait Caps**: Can possess Legendary and Amalgam traits.
 - **Obtainability**:
   - Nisza's shop stock in Westmarch.
   - Marketplace purchases.

@@ -39,6 +39,7 @@ export default defineConfig({
           { text: 'Skills & Attributes Tiers', link: '/guides/skills-and-attributes' },
           { text: 'Conversions & Conversion Stones', link: '/guides/conversion-guide' },
           { text: 'Traits Stacking & Priorities', link: '/guides/traits-guide' },
+          { text: 'Trait Values & Familiar Reference', link: '/guides/trait-values-reference' },
         ]
       },
       {
