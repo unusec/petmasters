@@ -34,6 +34,28 @@ export default defineConfig({
         ]
       },
       {
+        text: 'Ordinary familiars',
+        items: [
+          { text: 'How to get', link: '/guides/obtaining-ordinary-familiars' },
+          { text: 'What they are used for', link: '/guides/using-ordinary-familiars' },
+        ]
+      },
+      {
+        text: 'Aberrant familiars',
+        items: [
+          { text: 'How to get', link: '/guides/obtaining-aberrant-familiars' },
+          { text: 'What they are used for', link: '/guides/using-aberrant-familiars' },
+        ]
+      },
+      {
+        text: 'Traits',
+        items: [
+          { text: 'Common traits', link: '/guides/traits-common' },
+          { text: 'Advanced traits', link: '/guides/traits-advanced' },
+          { text: 'Utility traits', link: '/guides/traits-utility' },
+        ]
+      },
+      {
         text: '⚡ Mechanics & Breeding',
         items: [
           { text: 'Skills & Attributes Tiers', link: '/guides/skills-and-attributes' },
